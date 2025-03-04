@@ -21,42 +21,56 @@ const InviteUser = () => {
       </div>
 
       {/* Right side - Form */}
-      <div className="w-full h-162 bg-[#FFFFFF]  lg:w-1/2 lg:p-18   flex items-center">
-        <div className="w-full mt-2  max-w-md">
-          <h2 className="text-2xl font-medium text-gray-800 mb-2">
+      <div className="w-full max-w-[90%] sm:max-w-md lg:max-w-lg h-auto bg-[#FFFFFF] lg:w-1/2 p-6 lg:p-6 flex items-center shadow-lg rounded-lg justify-center mb-[10px] mx-auto">
+        <div className="w-full">
+          {/* Heading */}
+          <h2 className="text-[20px] mt-2 font-medium text-gray-800 text-center sm:text-left">
             Invite New User
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 text-[12px] font-normal mb-3 leading-[24px] text-center sm:text-left">
             Send an invitation to add a new team member
           </p>
 
+          {/* Form */}
           <form>
+            {/* Email Input */}
             <div className="mb-4">
-              <label htmlFor="email" className="block text-gray-700 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-[14px] mb-1 font-medium text-gray-700"
+              >
                 Email address
               </label>
               <input
                 type="email"
                 id="email"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 text-[13px] border border-gray-300 rounded-md"
                 placeholder="Email address"
               />
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-gray-500 text-[13px] mt-1">
                 The invitation will be sent to this email address
               </p>
             </div>
 
+            {/* Role Selection */}
             <div className="mb-4">
-              <label htmlFor="role" className="block text-gray-700 mb-2">
+              <label
+                htmlFor="role"
+                className="block text-[14px] font-medium text-gray-700 mb-1"
+              >
                 Select role
               </label>
               <div className="relative">
                 <select
                   id="role"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none"
+                  className="w-full text-[13px] px-3 py-2 border border-gray-300 rounded-md appearance-none"
                 >
-                  <option>select Role</option>
+                  <option value="">Select Role</option>
+                  <option value="System Admin">System Admin</option>
+                  <option value="Course Admin">Course Admin</option>
+                  <option value="Support Admin">Support Admin</option>
                 </select>
+                {/* Dropdown Icon */}
                 <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                   <svg
                     className="h-5 w-5 text-gray-400"
@@ -73,42 +87,48 @@ const InviteUser = () => {
               </div>
             </div>
 
-            <div className="mb-6">
-              <div className="bg-blue-50 border border-blue-100 rounded-md p-4 mb-4">
-                <h3 className="text-blue-600 font-medium mb-1">
+            {/* Role Description */}
+            <div className="mb-4">
+              <div className="bg-blue-50 border border-blue-100 rounded-md p-3">
+                <h3 className="text-blue-600 text-[13px] font-medium mb-1">
                   Role Description
                 </h3>
-                <p className="text-blue-600">
-                  example: full system acess and configuration rights
+                <p className="text-blue-600 text-[14px]">
+                  Example: Full system access and configuration rights
                 </p>
               </div>
             </div>
 
-            <div className="mb-6">
-              <label htmlFor="message" className="block text-gray-700 mb-2">
+            {/* Additional Message */}
+            <div className="mb-4">
+              <label
+                htmlFor="message"
+                className="block text-[14px] font-medium text-gray-700 mb-2"
+              >
                 Additional Message (Optional)
               </label>
               <textarea
                 id="message"
-                rows="4"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                placeholder="Add a personal message to the invitation email.."
+                rows="3"
+                className="w-full px-3 py-2 text-[13px] font-medium border border-gray-300 rounded-md"
+                placeholder="Add a personal message to the invitation email..."
               ></textarea>
             </div>
 
-            <div className="flex justify-between mb-10 flex-col sm:flex-row gap-4">
+            {/* Buttons */}
+            <div className="flex justify-between mb-4 flex-col sm:flex-row gap-4">
+              {" "}
               <button
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-16 rounded-md"
+                className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-9 rounded-md"
               >
-                Change role
+                Change Role
               </button>
-
               <button
                 type="button"
-                className="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-9 rounded-md border border-gray-300"
+                className="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-6 rounded-md border border-gray-300"
               >
-                cancel
+                Cancel
               </button>
             </div>
           </form>
