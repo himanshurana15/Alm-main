@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { UserPlus, Pencil, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const UserManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,7 +15,7 @@ const UserManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 5;
 
-  useEffect(() => {
+  const fetchUsers = () => {
     axios
       .get("http://localhost:8080/api/users/all")
       .then((response) => {
@@ -27,7 +28,7 @@ const UserManagement = () => {
         setUsers(mappedUsers);
       })
       .catch((error) => console.error("Error fetching users:", error));
-  }, []);
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -42,30 +43,58 @@ const UserManagement = () => {
     }
   };
 
+ 
+
   const handleDelete = async (email) => {
-    console.log("Attempting to delete user with email:", email); // Debugging
+    
+    // Show confirmation alert
+    const result = await Swal.fire({
+      title: `Are you sure?`,
+      text: `You are about to change the status of this user.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: `Yes, change it!`,
+    });
 
-    try {
-      const response = await axios.put(
-        `http://localhost:8080/api/users/soft-delete/email/${encodeURIComponent(email)}`
-      );
+    if (result.isConfirmed) {
+      try {
+        // ✅ Making API call with email in URL
+        const response = await axios.put(
+          `http://localhost:8080/api/users/toggle-status/email/${email}`
+        );
 
-      console.log("Response from server:", response.data);
+        console.log("Response from server:", response.data);
 
-      setUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          user.email === email ? { ...user, userStatus: "INACTIVE" } : user
-        )
-      );
-    } catch (error) {
-      console.error(
-        "Error deleting user:",
-        error.response ? error.response.data : error.message
-      );
+        
+        // Show success message
+        Swal.fire(
+          "Success!",
+          `User has been changed successfully.`,
+          "success"
+        );
+        fetchUsers();
+      } catch (error) {
+        console.error(
+          "Error toggling user status:",
+          error.response ? error.response.data : error.message
+        );
+
+        // Show error alert
+        Swal.fire(
+          "Error!",
+          "Something went wrong while updating the user status.",
+          "error"
+        );
+        fetchUsers();
+      }
     }
   };
 
-  
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const handleEdit = (user) => {
     navigate("/edituser", { state: { user } });
@@ -178,7 +207,7 @@ const UserManagement = () => {
                 >
                   <option value="">Status</option>
                   <option value="ACTIVE">Active</option>
-                  <option value="PANDING">Pending</option>
+                  <option value="PENDING">Pending</option>
                   <option value="INACTIVE">Inactive</option>
                 </select>
               </div>
