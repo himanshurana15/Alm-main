@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { toggleSuperUser } from "../../redux/authSlice";
+import { toggleSuperUser } from "../../redux/Auth/authSlice.js";
 import BusinessUserForm from "../components/BusinessUserForm";
 import SuperUserForm from "../components/SuperUserForm";
 import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion

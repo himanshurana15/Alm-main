@@ -14,3 +14,6 @@ const authSlice = createSlice({
 
 export const { toggleSuperUser } = authSlice.actions;
 export default authSlice.reducer;
+
+
+

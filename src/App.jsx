@@ -13,6 +13,9 @@ import LandingPage from "./DashBoard/LandingPage";
 import AdminAccountCreate from "./User/AdminAccoutCreate";
 import InviteUser from "./User/InviteUser";
 import EditUser from "./User/EditUser";
+import SignUp from "./Auth/components/SignUp";
+import Desktop from "./DashBoard/Desktop";
+import CreateDebtInstrumentForm from "./DashBoard/CreateDebtInstrumentForm ";
 
 function App() {
   return (
@@ -21,6 +24,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route path="/UserManagement" element={<UserManagement />} />
           <Route path="/forgetpassword" element={<ForgetPass />} />
           <Route path="/Resetpassword" element={<ResetPassword />} />
@@ -29,6 +33,8 @@ function App() {
           <Route path="/adminaccountcreate" element={<AdminAccountCreate />} />
           <Route path="/inviteuser" element={<InviteUser />} />
           <Route path="/edituser" element={<EditUser />} />
+          <Route path="/desktop" element={<Desktop />} />
+          <Route path="/createdeptinstrumentform" element={<CreateDebtInstrumentForm />} />
         </Routes>
       </Router>
     </>

@@ -7,7 +7,7 @@ const LandingPage = () => {
   return (
     <div className="w-full h-10 bg-blue-900">
       <div className="flex justify-center space-x-190">
-        <div className="h-10 w-30 justify-center space-x-1 flex items-center bg-blue-600 rounded px-4 py-2 text-white cursor-pointer" >
+        <div className="h-10 w-30 justify-center space-x-1 flex items-center bg-blue-600 rounded px-4 py-2 text-white cursor-pointer" onClick={() => navigate("/signup")}>
           click button
         </div>
         <div className="h-10 w-30 justify-center space-x-1 flex items-center bg-blue-600 rounded px-4 py-2 text-white cursor-pointer" onClick={() => navigate("/UserManagement")}>

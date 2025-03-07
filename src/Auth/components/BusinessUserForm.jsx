@@ -5,6 +5,9 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../firebaseConfig.js";
+
 const BusinessUserForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -49,6 +52,48 @@ const BusinessUserForm = () => {
     }
   };
 
+  const handleGoogleSignup = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const idToken = await user.getIdToken(); // Get Firebase ID Token
+
+      // console.log("Firebase ID Token:", idToken);
+
+      // Send Google user details to backend
+      const response = await axios.post(
+        "http://localhost:8080/auth/google-signup",
+        {
+          email: user.email,
+          name: user.displayName,
+          profileImage: user.photoURL,
+          isSocialMediaLogin: true,
+          idToken: idToken, // ✅ Send as 'idToken' instead of 'accessToken'
+        }
+      );
+
+      console.log("Google signup successful:", response.data);
+      navigate("/landingpage"); // Redirect to dashboard after signup
+    } catch (error) {
+      if (error.response && error.response.data.includes("inactive")) {
+        // alert(
+        //   "Your account is inactive. Please log in with a different email."
+        // );
+
+        // Sign out the inactive user from Firebase
+        await auth.signOut();
+
+        // Clear stored user details (optional)
+        // localStorage.removeItem("user");
+        handleGoogleSignup();
+
+      } else {
+        alert("Google signup failed. Please try again.");
+      }
+    }
+  };
+
   return (
     <div className="w-full h-130 max-w-md bg-white p-8 rounded-lg shadow-lg">
       <h2 className="text-[24px] font-semibold text-center leading-normal text-[#202020]">
@@ -58,8 +103,6 @@ const BusinessUserForm = () => {
       <p className="text-[#202020] text-center text-[14px] font-normal leading-normal mb-8">
         Sign in to access your account
       </p>
-
-      
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
@@ -92,8 +135,8 @@ const BusinessUserForm = () => {
         </div>
 
         {error && (
-        <p className="text-red-500 flex text-center text-sm mb-4">{error}</p>
-      )}
+          <p className="text-red-500 flex text-center text-sm mb-4">{error}</p>
+        )}
 
         <div className="flex items-center justify-between">
           <label className="flex items-center">
@@ -105,7 +148,10 @@ const BusinessUserForm = () => {
             />
             <span>Remember me</span>
           </label>
-          <Link to="/forgetpassword" className="text-sm text-blue-600 hover:underline">
+          <Link
+            to="/forgetpassword"
+            className="text-sm text-blue-600 hover:underline"
+          >
             Forgot password?
           </Link>
         </div>
@@ -123,8 +169,11 @@ const BusinessUserForm = () => {
           <div className="flex-1 h-px bg-gray-300"></div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <button className="flex items-center justify-center p-3 border rounded-lg hover:bg-gray-50">
+        <div className="grid grid-cols-2 gap-4 ">
+          <button
+            className="flex items-center justify-center p-3 border rounded-lg hover:bg-gray-50"
+            onClick={handleGoogleSignup}
+          >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 48 48">
               <path
                 fill="#4285F4"
@@ -156,11 +205,16 @@ const BusinessUserForm = () => {
           </button>
         </div>
         <p className="text-xs text-gray-500 text-center mt-6">
-              Protected by reCAPTCHA and subject to the Rhombus{' '}
-              <a href="#" className="text-blue-500 hover:text-blue-600">Privacy Policy</a>{' '}
-              and{' '}
-              <a href="#" className="text-blue-500 hover:text-blue-600">Terms of Service</a>.
-            </p>
+          Protected by reCAPTCHA and subject to the Rhombus{" "}
+          <a href="#" className="text-blue-500 hover:text-blue-600">
+            Privacy Policy
+          </a>{" "}
+          and{" "}
+          <a href="#" className="text-blue-500 hover:text-blue-600">
+            Terms of Service
+          </a>
+          .
+        </p>
       </form>
     </div>
   );

@@ -13,7 +13,9 @@ const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]); // Filtered users list
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 5;
+  // const usersPerPage = 5;
+  const [usersPerPage, setUsersPerPage] = useState(5); // Default for laptops
+
 
   const fetchUsers = () => {
     axios
@@ -43,10 +45,7 @@ const UserManagement = () => {
     }
   };
 
- 
-
   const handleDelete = async (email) => {
-    
     // Show confirmation alert
     const result = await Swal.fire({
       title: `Are you sure?`,
@@ -67,13 +66,8 @@ const UserManagement = () => {
 
         console.log("Response from server:", response.data);
 
-        
         // Show success message
-        Swal.fire(
-          "Success!",
-          `User has been changed successfully.`,
-          "success"
-        );
+        Swal.fire("Success!", `User has been changed successfully.`, "success");
         fetchUsers();
       } catch (error) {
         console.error(
@@ -96,6 +90,29 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
+
+  useEffect(() => {
+    const updateUsersPerPage = () => {
+      if (window.innerWidth < 768) {
+        setUsersPerPage(7); // Show 7 rows on mobile
+      } else {
+        setUsersPerPage(5); // Show 5 rows on larger screens
+      }
+    };
+  
+    // Set initial value based on screen size
+    updateUsersPerPage();
+  
+    // Listen for window resize events
+    window.addEventListener("resize", updateUsersPerPage);
+  
+    return () => {
+      window.removeEventListener("resize", updateUsersPerPage);
+    };
+  }, []);
+
+
+
   const handleEdit = (user) => {
     navigate("/edituser", { state: { user } });
   };
@@ -115,6 +132,8 @@ const UserManagement = () => {
     });
 
     setFilteredUsers(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
+
   }, [searchQuery, selectedRole, selectedStatus, users]);
 
   const indexOfLastUser = currentPage * usersPerPage;
@@ -122,6 +141,7 @@ const UserManagement = () => {
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
+  
   return (
     <div className="h-full w-full">
       <div className="min-h-screen  bg-[#F5F5F5] p-6 md:p-8">
@@ -152,7 +172,7 @@ const UserManagement = () => {
           </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-2 md:p-4">
+        <div className="bg-white rounded-lg shadow-lg p-5 md:p-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
             {/* Search Input */}
             <div className="relative w-full sm:w-80 lg:w-96 xl:w-1/2">
@@ -176,6 +196,7 @@ const UserManagement = () => {
                   type="text"
                   placeholder="Search by name or email..."
                   value={searchQuery}
+                 
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1 px-3 py-2 focus:outline-none"
                 />
@@ -215,79 +236,85 @@ const UserManagement = () => {
           </div>
 
           <div className="overflow-x-auto border:rounded-lg border-gray-200 border-solid">
-            <table className="w-full min-w-max">
-              <thead>
-                <tr className="border-b bg-gray-100">
-                  <th className="text-left py-3 px-4 text-gray-500 font-medium">
-                    NAME
-                  </th>
-                  <th className="text-left py-3 px-4 text-gray-500 font-medium">
-                    EMAIL
-                  </th>
-                  <th className="text-left py-3 px-4 text-gray-500 font-medium">
-                    ROLE
-                  </th>
-                  <th className="text-left py-3 px-4 text-gray-500 font-medium">
-                    STATUS
-                  </th>
-                  <th className="text-left py-3 px-4 text-gray-500 font-medium">
-                    ACTIONS
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentUsers.length > 0 ? (
-                  currentUsers.map((user, index) => (
-                    <tr key={index} className="border-b">
-                      <td className="py-3 px-4 text-sm">{user.fullName}</td>
-                      <td className="py-3 px-4 text-gray-500 text-sm">
-                        {user.email}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span
-                          className={`${user.userStatus} px-3 bg-[#DBEAFE] text-[#4462BF] py-1 rounded-full text-[10px]`}
-                        >
-                          {user.roleName}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span
-                          className={`${getStatusColor(
-                            user.userStatus
-                          )} px-3 py-1 rounded-full text-[10px]`}
-                        >
-                          {user.userStatus}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <button
-                          className="text-blue-500 hover:text-blue-600"
-                          onClick={() => handleEdit(user)}
-                        >
-                          <Pencil size={18} />
-                        </button>
-                        <button
-                          className="text-red-500 ml-4 hover:text-red-600"
-                          onClick={() => handleDelete(user.email)}
-                        >
-                          <Trash2 size={18} />
-                        </button>
+            <div className="max-h-[400px] md:max-h-none overflow-auto ">
+              {" "}
+              {/* Fixed height for 7 rows on mobile */}
+              <table className="w-full min-w-max">
+                <thead>
+                  <tr className="border-b bg-gray-100">
+                    <th className="text-left py-3 px-4 text-gray-500 font-medium">
+                      NAME
+                    </th>
+                    <th className="text-left py-3 px-4 text-gray-500 font-medium">
+                      EMAIL
+                    </th>
+                    <th className="text-left py-3 px-4 text-gray-500 font-medium">
+                      ROLE
+                    </th>
+                    <th className="text-left py-3 px-4 text-gray-500 font-medium">
+                      STATUS
+                    </th>
+                    <th className="text-left py-3 px-4 text-gray-500 font-medium">
+                      ACTIONS
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentUsers.length > 0 ? (
+                    currentUsers.map((user, index) => (
+                      <tr key={index} className="border-b">
+                        <td className="py-3 px-4 text-sm">{user.fullName}</td>
+                        <td className="py-3 px-4 text-gray-500 text-sm">
+                          {user.email}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span
+                            className={`${user.userStatus} px-3 bg-[#DBEAFE] text-[#4462BF] py-1 rounded-full text-[10px]`}
+                          >
+                            {user.roleName}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span
+                            className={`${getStatusColor(
+                              user.userStatus
+                            )} px-3 py-1 rounded-full text-[10px]`}
+                          >
+                            {user.userStatus}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <button
+                            className="text-blue-500 hover:text-blue-600"
+                            onClick={() => handleEdit(user)}
+                          >
+                            <Pencil size={18} />
+                          </button>
+                          <button
+                            className="text-red-500 ml-4 hover:text-red-600"
+                            onClick={() => handleDelete(user.email)}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        className="py-3 px-4 text-center text-gray-500"
+                      >
+                        No users found.
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan="5"
-                      className="py-3 px-4 text-center text-gray-500"
-                    >
-                      No users found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-            <div className="flex justify-between items-center w-full py-2 ">
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <div
+              className="flex justify-between mb-1 items-center w-full py-2 bg-white 
+              md:static fixed bottom-0 left-0 right-0 p-4 border-t shadow-md ">
               <span className="text-[14px]">
                 Showing {indexOfFirstUser + 1} to{" "}
                 {Math.min(indexOfLastUser, filteredUsers.length)} of{" "}
@@ -295,7 +322,7 @@ const UserManagement = () => {
               </span>
               <div className="flex space-x-2">
                 <button
-                  className="border border-gray-300 text-gray-500 px-6 py-2 text-[16px] hover:text-gray-600 hover:border-gray-400 rounded"
+                  className="border border-gray-300 text-gray-500 px-6 py-2 text-[16px] hover:text-gray-600 hover:border-gray-400 rounded disabled:opacity-50"
                   onClick={() =>
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
@@ -304,7 +331,7 @@ const UserManagement = () => {
                   Previous
                 </button>
                 <button
-                  className="border border-gray-300 text-gray-500 px-6 py-2 text-[16px] hover:text-gray-600 hover:border-gray-400 rounded"
+                  className="border border-gray-300 text-gray-500 px-6 py-2 text-[16px] hover:text-gray-600 hover:border-gray-400 rounded disabled:opacity-50"
                   onClick={() =>
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                   }
