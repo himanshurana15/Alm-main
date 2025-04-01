@@ -4,19 +4,19 @@ import { useNavigate } from "react-router-dom";
 const EmailVerifiaction = () => {
   const navigate = useNavigate();
 
-
-
   return (
     <div className="flex flex-col md:flex-row items-center justify-center min-h-screen w-full px-6 md:px-12 py-12 bg-[#F5F5F5] gap-6">
       {/* Left Section */}
       <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left pl-10 md:pl-20">
         <div className="w-full max-w-lg">
           {/* Logo */}
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-black rotate-45"></div>
-            <span className="text-2xl font-semibold">Rhombus</span>
+          <div className="flex items-center gap-1 mb-1">
+            <img
+              src="/ALM LOGO BRIGHT.png"
+              alt="Logo"
+              className="w-45 h-30 object-contain"
+            />
           </div>
-
           {/* Description */}
           <p className="text-[#5A5A5A] font-inter text-[14px] font-normal leading-[24px] mb-6">
             Directly addresses professional learners, emphasizing career
@@ -83,7 +83,10 @@ const EmailVerifiaction = () => {
           </button>
 
           <div className="flex items-center justify-center gap-2 text-gray-600 hover:text-gray-800">
-            <button className="flex items-center gap-2"   onClick={() => navigate('/')}>
+            <button
+              className="flex items-center gap-2"
+              onClick={() => navigate("/")}
+            >
               Logout
               <svg
                 width="20"

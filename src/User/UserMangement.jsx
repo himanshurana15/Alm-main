@@ -21,7 +21,7 @@ const UserManagement = () => {
     axios
       .get("http://localhost:8080/api/users/all")
       .then((response) => {
-        const mappedUsers = response.data.map((user) => ({
+        const mappedUsers = response.data.filter(user => user.role_id !== 1).map((user) => ({
           fullName: user.name, // Mapping 'name' to 'fullName'
           email: user.email,
           roleName: user.userCategory, // Mapping 'userCategory' to 'roleName'
@@ -148,9 +148,9 @@ const UserManagement = () => {
         <div className="flex items-center mb-4">
           <div className="flex items-center">
             {/* <div className="w-6 h-6 md:w-8 md:h-8 border-2 border-black transform rotate-45 mr-2"></div> */}
-            <span className="text-lg md:text-xl text-[24px] font-medium">
-              ALM
-            </span>
+            <button className="px-3 py-2 md:px-4 md:py-2 bg-[#848e86] text-white rounded-lg" onClick={() => navigate("/desktop/1")}>
+              Back to desktop
+            </button>
           </div>
         </div>
 
@@ -206,9 +206,9 @@ const UserManagement = () => {
             {/* Dropdowns */}
             <div className="flex w-full gap-4 sm:w-auto">
               {/* Role Dropdown - Left on Mobile, Normal on Laptop */}
-              <div className="w-1/2 sm:w-auto">
+              <div className="w-1/2  sm:w-auto">
                 <select
-                  className="px-4 py-2 justify-center border rounded-lg bg-white w-full sm:w-auto"
+                  className="px-4  py-2 justify-center border rounded-lg bg-white w-full sm:w-auto"
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value)}
                 >

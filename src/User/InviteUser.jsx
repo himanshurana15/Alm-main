@@ -7,9 +7,12 @@ const InviteUser = () => {
       <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left pl-10 md:pl-20">
         <div className="w-full max-w-lg p-10">
           {/* Logo */}
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-black rotate-45"></div>
-            <span className="text-[24px] font-semibold">Rhombus</span>
+          <div className="flex items-center gap-1 mb-1">
+            <img
+              src="/ALM LOGO BRIGHT.png"
+              alt="Logo"
+              className="w-45 h-30 object-contain"
+            />
           </div>
 
           {/* Description */}

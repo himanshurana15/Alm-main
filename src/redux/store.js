@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './Auth/authSlice';
-// import formReducer from './Form/formSlice';
+import debtInstrumentReducer from './Form/debtInstrumentSlice';
 
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
-    // form: formReducer,
+    debtInstrument: debtInstrumentReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false, // Disables serialization check (not recommended)
+    }),
 });

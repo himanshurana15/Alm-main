@@ -1,104 +1,114 @@
-
 import React, { useState } from 'react';
-import { Check, ChevronsUpDown, FileBox, DollarSign, Calendar, Briefcase, Info } from 'lucide-react';
+import { CalendarIcon, InfoIcon, CheckIcon } from 'lucide-react';
 
-const CreateDebtInstrument = () => {
-  // Current active step
-  const [activeStep, setActiveStep] = useState(0);
+const CreateDebtInstrumentForm = () => {
+  // State for current step
+  const [currentStep, setCurrentStep] = useState(1);
   
-  // Form data state
+  // State for form data
   const [formData, setFormData] = useState({
+    // Step 1: Instrument Basics
     instrumentName: '',
     instrumentType: '',
     lender: '',
     issueDate: '',
     maturityDate: '',
     currency: '',
+    
+    // Placeholders for other steps
+    // To be expanded based on requirements
   });
 
-  // Error state
+  // State for validation errors
   const [errors, setErrors] = useState({});
 
-  // Handle input change
-  const handleChange = (e) => {
+  // Handle input changes
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value
     });
     
-    // Clear error when field is updated
+    // Clear error for this field when user types
     if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: ''
-      });
+      const updatedErrors = {...errors};
+      delete updatedErrors[name];
+      setErrors(updatedErrors);
     }
   };
 
-  // Validate form data for current step
-  const validateStep = () => {
+  // Validate current step
+  const validateStep = (step) => {
     const newErrors = {};
-    let isValid = true;
-
-    if (activeStep === 0) {
-      if (!formData.instrumentName.trim()) {
-        newErrors.instrumentName = 'Instrument Name is required';
-        isValid = false;
-      }
+    
+    if (step === 1) {
+      if (!formData.instrumentName) newErrors.instrumentName = 'Instrument Name is required';
+      if (!formData.instrumentType) newErrors.instrumentType = 'Instrument Type is required';
+      if (!formData.lender) newErrors.lender = 'Lender is required';
+      if (!formData.issueDate) newErrors.issueDate = 'Issue Date is required';
+      if (!formData.maturityDate) newErrors.maturityDate = 'Maturity Date is required';
+      if (!formData.currency) newErrors.currency = 'Currency is required';
       
-      if (!formData.instrumentType) {
-        newErrors.instrumentType = 'Instrument Type is required';
-        isValid = false;
-      }
-      
-      if (!formData.lender) {
-        newErrors.lender = 'Lender is required';
-        isValid = false;
-      }
-      
-      if (!formData.issueDate) {
-        newErrors.issueDate = 'Issue Date is required';
-        isValid = false;
-      }
-      
-      if (!formData.maturityDate) {
-        newErrors.maturityDate = 'Maturity Date is required';
-        isValid = false;
-      }
-      
-      if (!formData.currency) {
-        newErrors.currency = 'Currency is required';
-        isValid = false;
-      }
-      
-      // Additional validation: maturity date must be after issue date
-      if (formData.issueDate && formData.maturityDate) {
-        const issueDate = new Date(formData.issueDate);
-        const maturityDate = new Date(formData.maturityDate);
-        
-        if (maturityDate <= issueDate) {
-          newErrors.maturityDate = 'Maturity Date must be after Issue Date';
-          isValid = false;
-        }
+      // Additional validation
+      if (formData.maturityDate && formData.issueDate && 
+          new Date(formData.maturityDate) <= new Date(formData.issueDate)) {
+        newErrors.maturityDate = 'Maturity Date must be after Issue Date';
       }
     }
-
+    
+    // Add validation for other steps as needed
+    
     setErrors(newErrors);
-    return isValid;
+    return Object.keys(newErrors).length === 0;
   };
 
-  // Next step handler
+  // Handle next step
   const handleNext = () => {
-    if (validateStep()) {
-      setActiveStep(activeStep + 1);
+    if (validateStep(currentStep)) {
+      setCurrentStep(prev => Math.min(prev + 1, 5));
     }
   };
 
-  // Previous step handler
+  // Handle previous step
   const handlePrevious = () => {
-    setActiveStep(activeStep - 1);
+    setCurrentStep(prev => Math.max(prev - 1, 1));
   };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateStep(currentStep)) {
+      // Submit form data to backend
+      console.log('Form submitted:', formData);
+      // Reset form after successful submission
+      setFormData({
+        instrumentName: '',
+        instrumentType: '',
+        lender: '',
+        issueDate: '',
+        maturityDate: '',
+        currency: ''
+      });
+      setCurrentStep(1);
+    }
+  };
+
+  // Sample data for dropdowns
+  const instrumentTypes = [
+    'Term Loan', 'Revolving Credit Facility', 'Bond', 'Commercial Paper', 
+    'Private Placement', 'Syndicated Loan', 'Bilateral Loan'
+  ];
+  
+  const currencies = [
+    'USD - US Dollar', 'EUR - Euro', 'GBP - British Pound', 'JPY - Japanese Yen', 
+    'CHF - Swiss Franc', 'CAD - Canadian Dollar', 'AUD - Australian Dollar'
+  ];
+  
+  const lenders = [
+    'ABC Bank', 'XYZ Financial Services', 'Global Investment Ltd.', 
+    'International Finance Group', 'Regional Bank Corp.', 'National Funding LLC'
+  ];
 
   // Step titles
   const steps = [
@@ -109,59 +119,51 @@ const CreateDebtInstrument = () => {
     'Review & Confirm'
   ];
 
-  // Mock data for dropdowns
-  const instrumentTypes = ['Term Loan', 'Revolving Credit', 'Bond', 'Note', 'Commercial Paper', 'Line of Credit'];
-  const lenders = ['Bank of America', 'JPMorgan Chase', 'Wells Fargo', 'Citibank', 'Goldman Sachs', 'Morgan Stanley'];
-  const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY'];
-
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm p-4 border-b">
-        <div className="container mx-auto">
-          <h1 className="text-2xl font-semibold text-gray-800">Create New Debt Instrument</h1>
-          <p className="text-gray-500">Debt Management Module</p>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-5xl mx-auto bg-white rounded-lg shadow-md">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h1 className="text-2xl font-bold text-gray-800">Create New Debt Instrument</h1>
+          <p className="text-gray-600">Debt Management Module</p>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 container mx-auto px-4 py-6">
-        {/* Stepper */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        
+        {/* Step Indicator */}
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="flex justify-between items-center">
             {steps.map((step, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div 
-                  className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-medium
-                    ${index < activeStep ? 'bg-blue-600 text-white' : 
-                      index === activeStep ? 'bg-blue-100 border-2 border-blue-600 text-blue-600' : 
-                      'bg-gray-100 text-gray-500'}`}
-                >
-                  {index < activeStep ? <Check className="w-5 h-5" /> : index + 1}
+              <div key={index} className="flex flex-col items-center flex-1">
+                <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                  currentStep > index + 1 ? 'bg-green-500' : 
+                  currentStep === index + 1 ? 'bg-blue-500' : 'bg-gray-300'
+                } text-white font-bold`}>
+                  {currentStep > index + 1 ? <CheckIcon className="w-5 h-5" /> : index + 1}
                 </div>
-                <span className={`mt-2 text-sm ${index === activeStep ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
+                <span className={`mt-2 text-sm ${
+                  currentStep === index + 1 ? 'text-blue-500 font-medium' : 'text-gray-500'
+                }`}>
                   {step}
                 </span>
                 {index < steps.length - 1 && (
-                  <div className="hidden sm:block h-0.5 w-32 bg-gray-200 -mt-5 ml-32"></div>
+                  <div className="hidden sm:block w-full h-1 bg-gray-200 absolute" 
+                      style={{top: '37px', left: `calc(${(index + 1) * 100 / steps.length}% - 40px)`, 
+                      width: `calc(100% / ${steps.length})`}} />
                 )}
               </div>
             ))}
           </div>
         </div>
-
-        {/* Form Container */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        
+        <form onSubmit={handleSubmit} className="px-6 py-4">
           {/* Step 1: Instrument Basics */}
-          {activeStep === 0 && (
-            <div>
-              <h2 className="text-xl font-semibold mb-6 text-gray-800 flex items-center">
-                <FileBox className="mr-2 text-blue-600" />
-                Instrument Basics
-              </h2>
+          {currentStep === 1 && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-800">Instrument Basics</h2>
+              <p className="text-gray-600">Enter the fundamental details of the debt instrument.</p>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Instrument Name */}
-                <div className="col-span-2">
+                <div>
                   <label htmlFor="instrumentName" className="block text-sm font-medium text-gray-700 mb-1">
                     Instrument Name <span className="text-red-500">*</span>
                   </label>
@@ -170,16 +172,15 @@ const CreateDebtInstrument = () => {
                     id="instrumentName"
                     name="instrumentName"
                     value={formData.instrumentName}
-                    onChange={handleChange}
-                    className={`w-full p-3 border rounded-md ${errors.instrumentName ? 'border-red-500' : 'border-gray-300'}`}
+                    onChange={handleInputChange}
+                    className={`w-full p-2 border rounded-md ${
+                      errors.instrumentName ? 'border-red-500' : 'border-gray-300'
+                    } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                     placeholder="Enter instrument name"
                   />
                   {errors.instrumentName && (
                     <p className="mt-1 text-sm text-red-500">{errors.instrumentName}</p>
                   )}
-                  <p className="mt-1 text-xs text-gray-500">
-                    Provide a unique, descriptive name for this debt instrument
-                  </p>
                 </div>
 
                 {/* Instrument Type */}
@@ -187,21 +188,20 @@ const CreateDebtInstrument = () => {
                   <label htmlFor="instrumentType" className="block text-sm font-medium text-gray-700 mb-1">
                     Instrument Type <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative">
-                    <select
-                      id="instrumentType"
-                      name="instrumentType"
-                      value={formData.instrumentType}
-                      onChange={handleChange}
-                      className={`w-full p-3 pr-10 border rounded-md appearance-none bg-white ${errors.instrumentType ? 'border-red-500' : 'border-gray-300'}`}
-                    >
-                      <option value="">Select an instrument type</option>
-                      {instrumentTypes.map((type) => (
-                        <option key={type} value={type}>{type}</option>
-                      ))}
-                    </select>
-                    <ChevronsUpDown className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
-                  </div>
+                  <select
+                    id="instrumentType"
+                    name="instrumentType"
+                    value={formData.instrumentType}
+                    onChange={handleInputChange}
+                    className={`w-full p-2 border rounded-md ${
+                      errors.instrumentType ? 'border-red-500' : 'border-gray-300'
+                    } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  >
+                    <option value="">Select instrument type</option>
+                    {instrumentTypes.map((type, index) => (
+                      <option key={index} value={type}>{type}</option>
+                    ))}
+                  </select>
                   {errors.instrumentType && (
                     <p className="mt-1 text-sm text-red-500">{errors.instrumentType}</p>
                   )}
@@ -212,21 +212,20 @@ const CreateDebtInstrument = () => {
                   <label htmlFor="lender" className="block text-sm font-medium text-gray-700 mb-1">
                     Lender <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative">
-                    <select
-                      id="lender"
-                      name="lender"
-                      value={formData.lender}
-                      onChange={handleChange}
-                      className={`w-full p-3 pr-10 border rounded-md appearance-none bg-white ${errors.lender ? 'border-red-500' : 'border-gray-300'}`}
-                    >
-                      <option value="">Select a lender</option>
-                      {lenders.map((lender) => (
-                        <option key={lender} value={lender}>{lender}</option>
-                      ))}
-                    </select>
-                    <Briefcase className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
-                  </div>
+                  <select
+                    id="lender"
+                    name="lender"
+                    value={formData.lender}
+                    onChange={handleInputChange}
+                    className={`w-full p-2 border rounded-md ${
+                      errors.lender ? 'border-red-500' : 'border-gray-300'
+                    } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  >
+                    <option value="">Select lender</option>
+                    {lenders.map((lender, index) => (
+                      <option key={index} value={lender}>{lender}</option>
+                    ))}
+                  </select>
                   {errors.lender && (
                     <p className="mt-1 text-sm text-red-500">{errors.lender}</p>
                   )}
@@ -243,10 +242,12 @@ const CreateDebtInstrument = () => {
                       id="issueDate"
                       name="issueDate"
                       value={formData.issueDate}
-                      onChange={handleChange}
-                      className={`w-full p-3 border rounded-md ${errors.issueDate ? 'border-red-500' : 'border-gray-300'}`}
+                      onChange={handleInputChange}
+                      className={`w-full p-2 border rounded-md ${
+                        errors.issueDate ? 'border-red-500' : 'border-gray-300'
+                      } focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10`}
                     />
-                    <Calendar className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
+                    <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   </div>
                   {errors.issueDate && (
                     <p className="mt-1 text-sm text-red-500">{errors.issueDate}</p>
@@ -264,10 +265,12 @@ const CreateDebtInstrument = () => {
                       id="maturityDate"
                       name="maturityDate"
                       value={formData.maturityDate}
-                      onChange={handleChange}
-                      className={`w-full p-3 border rounded-md ${errors.maturityDate ? 'border-red-500' : 'border-gray-300'}`}
+                      onChange={handleInputChange}
+                      className={`w-full p-2 border rounded-md ${
+                        errors.maturityDate ? 'border-red-500' : 'border-gray-300'
+                      } focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10`}
                     />
-                    <Calendar className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
+                    <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   </div>
                   {errors.maturityDate && (
                     <p className="mt-1 text-sm text-red-500">{errors.maturityDate}</p>
@@ -279,21 +282,20 @@ const CreateDebtInstrument = () => {
                   <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-1">
                     Currency <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative">
-                    <select
-                      id="currency"
-                      name="currency"
-                      value={formData.currency}
-                      onChange={handleChange}
-                      className={`w-full p-3 pr-10 border rounded-md appearance-none bg-white ${errors.currency ? 'border-red-500' : 'border-gray-300'}`}
-                    >
-                      <option value="">Select a currency</option>
-                      {currencies.map((currency) => (
-                        <option key={currency} value={currency}>{currency}</option>
-                      ))}
-                    </select>
-                    <DollarSign className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
-                  </div>
+                  <select
+                    id="currency"
+                    name="currency"
+                    value={formData.currency}
+                    onChange={handleInputChange}
+                    className={`w-full p-2 border rounded-md ${
+                      errors.currency ? 'border-red-500' : 'border-gray-300'
+                    } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  >
+                    <option value="">Select currency</option>
+                    {currencies.map((currency, index) => (
+                      <option key={index} value={currency}>{currency}</option>
+                    ))}
+                  </select>
                   {errors.currency && (
                     <p className="mt-1 text-sm text-red-500">{errors.currency}</p>
                   )}
@@ -302,74 +304,92 @@ const CreateDebtInstrument = () => {
             </div>
           )}
 
-          {/* Placeholder for other steps */}
-          {activeStep === 1 && (
-            <div>
-              <h2 className="text-xl font-medium mb-6">Principal & Interest</h2>
-              <p className="text-gray-500">This step would contain fields for principal amount, interest rate type, interest rate, etc.</p>
+          {/* Step 2: Principal & Interest (Placeholder) */}
+          {currentStep === 2 && (
+            <div className="text-center py-12">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">Principal & Interest</h2>
+              <p className="text-gray-500">This step would include fields for principal amount, interest rate type, base rate, margin, etc.</p>
             </div>
           )}
-          
-          {activeStep === 2 && (
-            <div>
-              <h2 className="text-xl font-medium mb-6">Repayment Schedule</h2>
-              <p className="text-gray-500">This step would contain fields for repayment frequency, payment terms, etc.</p>
-            </div>
-          )}
-          
-          {activeStep === 3 && (
-            <div>
-              <h2 className="text-xl font-medium mb-6">Covenants & Documents</h2>
-              <p className="text-gray-500">This step would contain fields for covenants, document uploads, etc.</p>
-            </div>
-          )}
-          
-          {activeStep === 4 && (
-            <div>
-              <h2 className="text-xl font-medium mb-6">Review & Confirm</h2>
-              <p className="text-gray-500">This step would show a summary of all entered information for review.</p>
-            </div>
-          )}
-        </div>
 
-        {/* Info Panel */}
-        <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6">
-          <div className="flex items-start">
-            <Info className="text-blue-500 mt-0.5 mr-3 flex-shrink-0" />
+          {/* Step 3: Repayment Schedule (Placeholder) */}
+          {currentStep === 3 && (
+            <div className="text-center py-12">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">Repayment Schedule</h2>
+              <p className="text-gray-500">This step would include fields for repayment frequency, amortization schedule, balloon payments, etc.</p>
+            </div>
+          )}
+
+          {/* Step 4: Covenants & Documents (Placeholder) */}
+          {currentStep === 4 && (
+            <div className="text-center py-12">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">Covenants & Documents</h2>
+              <p className="text-gray-500">This step would include fields for financial covenants, document uploads, etc.</p>
+            </div>
+          )}
+
+          {/* Step 5: Review & Confirm (Placeholder) */}
+          {currentStep === 5 && (
+            <div className="text-center py-12">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">Review & Confirm</h2>
+              <p className="text-gray-500">This step would show a summary of all entered information for final review.</p>
+            </div>
+          )}
+
+          {/* Form Actions */}
+          <div className="mt-8 flex justify-between border-t border-gray-200 pt-4">
+            <button
+              type="button"
+              onClick={handlePrevious}
+              disabled={currentStep === 1}
+              className={`px-4 py-2 rounded-md ${
+                currentStep === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-100 hover:bg-gray-200'
+              } text-gray-700 font-medium`}
+            >
+              Previous
+            </button>
+            
             <div>
-              <h3 className="font-medium text-blue-700">ALM Analyst Guidance</h3>
-              <p className="text-sm text-blue-600">
-                {activeStep === 0 && "Complete all required fields in the Instrument Basics step. The instrument name should be unique and descriptive. All fields marked with * are mandatory."}
-                {activeStep === 1 && "Provide accurate principal and interest information. For variable rate instruments, specify the reference rate and spread."}
-                {activeStep === 2 && "Define the repayment schedule including frequency and specific terms."}
-                {activeStep === 3 && "Upload all relevant documentation and specify any covenants or conditions."}
-                {activeStep === 4 && "Carefully review all entered information before final submission."}
-              </p>
+              {currentStep < 5 ? (
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-md"
+                >
+                  Next
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-md"
+                >
+                  Submit
+                </button>
+              )}
             </div>
           </div>
+        </form>
+      </div>
+      
+      {/* Help Information */}
+      <div className="max-w-5xl mx-auto mt-4 p-4 bg-blue-50 rounded-lg shadow-sm border border-blue-100">
+        <div className="flex items-start">
+          <InfoIcon className="text-blue-500 w-5 h-5 mt-0.5" />
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-blue-800">Help Information</h3>
+            <p className="text-sm text-blue-600">
+              This form allows ALM Analysts and Managers to create new debt instruments in the system. 
+              All required fields are marked with an asterisk (*). For assistance, please contact the ALM support team.
+            </p>
+          </div>
         </div>
-
-        {/* Navigation Buttons */}
-        <div className="flex justify-between">
-          <button
-            onClick={handlePrevious}
-            disabled={activeStep === 0}
-            className={`px-6 py-2 rounded-md ${activeStep === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'}`}
-          >
-            Previous
-          </button>
-          <button
-            onClick={handleNext}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
-          </button>
-        </div>
-      </main>
+      </div>
     </div>
   );
 };
+export default CreateDebtInstrumentForm;
 
-export default CreateDebtInstrument;
+
+
 
 

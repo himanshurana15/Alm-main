@@ -1,8 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 const ForgotPassword = () => {
-
-
   const navigate = useNavigate();
   return (
     <div className="flex flex-col md:flex-row items-center justify-center min-h-screen w-full px-6 md:px-12 py-12 bg-[#F5F5F5] gap-6">
@@ -10,9 +8,12 @@ const ForgotPassword = () => {
       <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left pl-10 md:pl-20">
         <div className="w-full max-w-lg">
           {/* Logo */}
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-black rotate-45"></div>
-            <span className="text-2xl font-semibold">Rhombus</span>
+          <div className="flex items-center gap-1 mb-1">
+            <img
+              src="/ALM LOGO BRIGHT.png"
+              alt="Logo"
+              className="w-45 h-30 object-contain"
+            />
           </div>
 
           {/* Description */}
@@ -66,18 +67,23 @@ const ForgotPassword = () => {
               </label>
               <input
                 type="email"
-                
                 placeholder="Email address"
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500"
                 required
               />
             </div>
 
-            <button className="w-full bg-blue-500 text-white py-3 mt-5 rounded-lg hover:bg-blue-600 font-medium" onClick={() => navigate("/emailverify")}>
+            <button
+              className="w-full bg-blue-500 text-white py-3 mt-5 rounded-lg hover:bg-blue-600 font-medium"
+              onClick={() => navigate("/emailverify")}
+            >
               Send via Email
             </button>
 
-            <button className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50" onClick={() => navigate("/")}>
+            <button
+              className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50"
+              onClick={() => navigate("/")}
+            >
               Cancel
             </button>
           </div>
